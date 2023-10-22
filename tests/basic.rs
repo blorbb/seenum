@@ -52,4 +52,9 @@ fn traversal() {
     assert_eq!(third.saturating_next(), E::D);
 }
 
+fn slice() {
+    let s = E::as_slice();
+    assert_eq!(s, [E::A, E::B, E::C, E::D].as_slice());
+}
+
 fn main() {}

@@ -248,4 +248,23 @@ pub unsafe trait EnumSelect: Sized {
     fn saturating_prev(&self) -> Self {
         self.checked_prev().unwrap_or_else(Self::first)
     }
+
+    /// Returns all variants as a slice, in order from first to last.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use enum_select::EnumSelect;
+    /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
+    /// #[repr(usize)]
+    /// enum Note {
+    ///     A, B, C, D, E, F, G
+    /// }
+    ///
+    /// let slice = Note::as_slice();
+    /// assert_eq!(slice[1], Note::B);
+    /// assert_eq!(slice.len(), 7);
+    /// ```
+
+    fn as_slice() -> &'static [Self];
 }
