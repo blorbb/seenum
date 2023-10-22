@@ -3,6 +3,47 @@ use proc_macro_error::abort;
 use quote::quote;
 use syn::{punctuated::Punctuated, spanned::Spanned, Token};
 
+pub fn derive_display(input: TokenStream) -> syn::Result<TokenStream> {
+    let input = syn::parse2::<syn::DeriveInput>(input)?;
+
+    let syn::Data::Enum(data_enum) = input.data else {
+        abort!(Span::call_site(), "`Display` is only supported on enums")
+    };
+
+    let pairs: Vec<(proc_macro2::Ident, TokenStream)> = data_enum
+        .variants
+        .iter()
+        .map(|variant| {
+            let display_attr = variant
+                .attrs
+                .iter()
+                .find(|attr| attr.path().is_ident("display"))
+                .unwrap_or_else(|| {
+                    abort!(
+                        variant.span(),
+                        "`#[display(...)]` attribute required for all variants"
+                    )
+                });
+            let inner: TokenStream = display_attr.parse_args()?;
+
+            Ok((variant.ident.clone(), inner))
+        })
+        .collect::<syn::Result<Vec<_>>>()?;
+
+    let (name, inner): (Vec<_>, Vec<_>) = pairs.into_iter().unzip();
+    let enum_name = input.ident;
+
+    Ok(quote! {
+        impl ::core::fmt::Display for #enum_name {
+            fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+                match self {
+                    #(Self::#name => ::core::write!(f, #inner),)*
+                }
+            }
+        }
+    })
+}
+
 pub fn derive_enum_select(input: TokenStream) -> TokenStream {
     let input = syn::parse2(input).unwrap_or_else(|e| abort!(e.span(), e.to_string()));
     let UnitEnum { name, variants } = validate_input(input);

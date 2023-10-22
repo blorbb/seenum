@@ -1,6 +1,6 @@
 use std::num::NonZeroUsize;
 
-pub use enum_select_derive::EnumSelect;
+pub use enum_select_derive::{Display, EnumSelect};
 
 /// An enum trait for traversing through its variants.
 ///
