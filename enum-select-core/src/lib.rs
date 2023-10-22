@@ -56,10 +56,12 @@ pub fn derive_enum_select(input: TokenStream) -> TokenStream {
 
     quote! {
         unsafe impl ::enum_select::EnumSelect for #name {
+            // SAFETY: `count` is non-zero as validated by `validate_input`.
             const COUNT: ::std::num::NonZeroUsize =
                 unsafe { ::std::num::NonZeroUsize::new_unchecked(#count) };
 
             unsafe fn from_index_unchecked(index: ::std::primitive::usize) -> Self {
+                // SAFETY: `index` must be between `0..Self::COUNT`.
                 unsafe { ::std::mem::transmute(index) }
             }
 
@@ -71,7 +73,7 @@ pub fn derive_enum_select(input: TokenStream) -> TokenStream {
 }
 
 /// Validates the derive input to be a `#[repr(usize)]` enum with only unit
-/// variants and no custom discriminants.
+/// variants, no custom discriminants and at least one variant.
 fn validate_input(input: syn::DeriveInput) -> UnitEnum {
     let is_repr_usize = input.attrs.iter().any(|attr| {
         attr.path().is_ident("repr")
