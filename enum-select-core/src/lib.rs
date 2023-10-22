@@ -1,8 +1,12 @@
+#![forbid(unsafe_op_in_unsafe_fn)]
+#![warn(clippy::pedantic)]
+
 use proc_macro2::{Span, TokenStream};
 use proc_macro_error::abort;
 use quote::quote;
 use syn::{punctuated::Punctuated, spanned::Spanned, Token};
 
+#[allow(clippy::missing_errors_doc)]
 pub fn derive_display(input: TokenStream) -> syn::Result<TokenStream> {
     let input = syn::parse2::<syn::DeriveInput>(input)?;
 
@@ -44,6 +48,7 @@ pub fn derive_display(input: TokenStream) -> syn::Result<TokenStream> {
     })
 }
 
+#[must_use]
 pub fn derive_enum_select(input: TokenStream) -> TokenStream {
     let input = syn::parse2(input).unwrap_or_else(|e| abort!(e.span(), e.to_string()));
     let UnitEnum { name, variants } = validate_input(input);

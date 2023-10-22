@@ -1,3 +1,6 @@
+#![forbid(unsafe_op_in_unsafe_fn)]
+#![warn(clippy::pedantic)]
+
 use std::num::NonZeroUsize;
 
 pub use enum_select_derive::{Display, EnumSelect};
@@ -36,11 +39,13 @@ pub unsafe trait EnumSelect: Sized {
 
     // This method can't have a default implementation as the size is unknown,
     // `std::mem::transmute` doesn't compile.
+    #[must_use]
     unsafe fn from_index_unchecked(index: usize) -> Self;
 
     /// Converts an index discriminant to an enum variant.
     ///
     /// If the index is not within `0..Self::COUNT`, [`None`] is returned.
+    #[must_use]
     fn try_from_index(index: usize) -> Option<Self> {
         if (0..Self::COUNT.into()).contains(&index) {
             // SAFETY: index is a valid discriminant
@@ -67,7 +72,10 @@ pub unsafe trait EnumSelect: Sized {
     fn to_index(&self) -> usize {
         // https://doc.rust-lang.org/stable/reference/items/enumerations.html#pointer-casting
         // SAFETY: the enum has a #[repr(usize)]
-        unsafe { *(self as *const Self as *const usize) }
+        #[allow(clippy::ptr_as_ptr)]
+        unsafe {
+            *(self as *const Self as *const usize)
+        }
     }
 
     /// Gets the first variant.
@@ -84,6 +92,7 @@ pub unsafe trait EnumSelect: Sized {
     ///
     /// assert_eq!(Note::first(), Note::A);
     /// ```
+    #[must_use]
     fn first() -> Self {
         Self::try_from_index(0).expect("enum should have at least one variant")
     }
@@ -102,6 +111,7 @@ pub unsafe trait EnumSelect: Sized {
     ///
     /// assert_eq!(Note::last(), Note::G);
     /// ```
+    #[must_use]
     fn last() -> Self {
         Self::try_from_index(usize::from(Self::COUNT) - 1)
             .expect("enum should have at least one variant")
@@ -125,6 +135,7 @@ pub unsafe trait EnumSelect: Sized {
     /// assert_eq!(f.wrapping_next(), Note::G);
     /// assert_eq!(g.wrapping_next(), Note::A);
     /// ```
+    #[must_use = "returns a new instance instead of modifying its argument"]
     fn wrapping_next(&self) -> Self {
         Self::try_from_index((self.to_index() + 1) % usize::from(Self::COUNT))
             .expect("index should be within range 0..Self::COUNT")
@@ -148,6 +159,7 @@ pub unsafe trait EnumSelect: Sized {
     /// assert_eq!(b.wrapping_prev(), Note::A);
     /// assert_eq!(a.wrapping_prev(), Note::G);
     /// ```
+    #[must_use = "returns a new instance instead of modifying its argument"]
     fn wrapping_prev(&self) -> Self {
         Self::try_from_index(
             (self.to_index() + usize::from(Self::COUNT) - 1) % usize::from(Self::COUNT),
@@ -172,6 +184,7 @@ pub unsafe trait EnumSelect: Sized {
     /// assert_eq!(f.checked_next(), Some(Note::G));
     /// assert_eq!(g.checked_next(), None);
     /// ```
+    #[must_use = "returns a new instance instead of modifying its argument"]
     fn checked_next(&self) -> Option<Self> {
         if self.to_index() == usize::from(Self::COUNT) - 1 {
             None
@@ -197,6 +210,7 @@ pub unsafe trait EnumSelect: Sized {
     /// assert_eq!(b.checked_prev(), Some(Note::A));
     /// assert_eq!(a.checked_prev(), None);
     /// ```
+    #[must_use = "returns a new instance instead of modifying its argument"]
     fn checked_prev(&self) -> Option<Self> {
         if self.to_index() == 0 {
             None
@@ -223,6 +237,7 @@ pub unsafe trait EnumSelect: Sized {
     /// assert_eq!(f.saturating_next(), Note::G);
     /// assert_eq!(g.saturating_next(), Note::G);
     /// ```
+    #[must_use = "returns a new instance instead of modifying its argument"]
     fn saturating_next(&self) -> Self {
         self.checked_next().unwrap_or_else(Self::last)
     }
@@ -245,6 +260,7 @@ pub unsafe trait EnumSelect: Sized {
     /// assert_eq!(b.saturating_prev(), Note::A);
     /// assert_eq!(a.saturating_prev(), Note::A);
     /// ```
+    #[must_use = "returns a new instance instead of modifying its argument"]
     fn saturating_prev(&self) -> Self {
         self.checked_prev().unwrap_or_else(Self::first)
     }
@@ -265,6 +281,6 @@ pub unsafe trait EnumSelect: Sized {
     /// assert_eq!(slice[1], Note::B);
     /// assert_eq!(slice.len(), 7);
     /// ```
-
+    #[must_use]
     fn as_slice() -> &'static [Self];
 }
