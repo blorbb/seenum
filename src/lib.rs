@@ -1,113 +1,74 @@
-use core::fmt;
 use std::num::NonZeroUsize;
 
 pub use enum_select_derive::EnumSelect;
 
-pub trait EnumSelect: ConvertIndex {
-    fn first() -> Self;
-    fn last() -> Self;
-
-    fn wrapping_next(&self) -> Self;
-    fn wrapping_prev(&self) -> Self;
-    fn checked_next(&self) -> Option<Self>
-    where
-        Self: Sized;
-    fn checked_prev(&self) -> Option<Self>
-    where
-        Self: Sized;
-    fn saturating_next(&self) -> Self;
-    fn saturating_prev(&self) -> Self;
-}
-
-pub trait ConvertIndex {
-    type Repr;
+/// This trait must only be implemented on unit enums with a `#[repr(usize)]`.
+/// All variants must also have the default discriminant, so that discriminants
+/// in the range `0..Self::COUNT` are all defined.
+pub unsafe trait EnumSelect: Sized {
     const COUNT: NonZeroUsize;
 
-    fn try_from_index(index: Self::Repr) -> Option<Self>
-    where
-        Self: Sized;
-    unsafe fn from_index_unchecked(index: Self::Repr) -> Self;
+    // This method can't have a default implementation as the size is unknown,
+    // `std::mem::transmute` doesn't compile.
+    unsafe fn from_index_unchecked(index: usize) -> Self;
 
-    fn to_index(&self) -> Self::Repr;
-}
-
-// TODO: use unsafe?
-macro_rules! impl_enum_select {
-    ($repr:ty) => {
-        impl<T> EnumSelect for T
-        where
-            T: ConvertIndex<Repr = $repr>,
-        {
-            fn first() -> Self {
-                Self::try_from_index(0).expect("enum should have at least one variant")
-            }
-
-            fn last() -> Self {
-                Self::try_from_index(expect_count_into::<$repr>(Self::COUNT) - 1)
-                    .expect("enum should have at least one variant")
-            }
-
-            fn wrapping_next(&self) -> Self {
-                Self::try_from_index((self.to_index() + 1) % expect_count_into::<$repr>(Self::COUNT))
-                    .expect("index should be within range 0..Self::COUNT")
-            }
-
-            fn wrapping_prev(&self) -> Self {
-                Self::try_from_index(
-                    (self.to_index() + expect_count_into::<$repr>(Self::COUNT) - 1)
-                        % expect_count_into::<$repr>(Self::COUNT),
-                )
-                .expect("index should be within range 0..Self::COUNT")
-            }
-
-            fn checked_next(&self) -> Option<Self>
-            where
-                Self: Sized,
-            {
-                if self.to_index() == expect_count_into::<$repr>(Self::COUNT) - 1 {
-                    None
-                } else {
-                    Some(
-                        Self::try_from_index(self.to_index() + 1).expect("self should not be last"),
-                    )
-                }
-            }
-
-            fn checked_prev(&self) -> Option<Self>
-            where
-                Self: Sized,
-            {
-                if self.to_index() == 0 {
-                    None
-                } else {
-                    Some(
-                        Self::try_from_index(self.to_index() - 1)
-                            .expect("self should not be first"),
-                    )
-                }
-            }
-
-            fn saturating_next(&self) -> Self {
-                self.checked_next().unwrap_or_else(Self::last)
-            }
-
-            fn saturating_prev(&self) -> Self {
-                self.checked_prev().unwrap_or_else(Self::first)
-            }
+    fn try_from_index(index: usize) -> Option<Self> {
+        if (0..Self::COUNT.into()).contains(&index) {
+            // SAFETY: index is a valid discriminant
+            Some(unsafe { Self::from_index_unchecked(index) })
+        } else {
+            None
         }
-    };
-    ($($repr:ty)+) => {
-        $(
-            impl_enum_select!($repr);
-        )+
-    };
-}
+    }
 
-#[track_caller]
-fn expect_count_into<T>(count: NonZeroUsize) -> T
-where
-    T: TryFrom<usize>,
-    <T as TryFrom<usize>>::Error: fmt::Debug,
-{
-    T::try_from(usize::from(count)).expect("`Self::COUNT` cannot be greater than the repr size")
+    fn to_index(&self) -> usize {
+        // https://doc.rust-lang.org/stable/reference/items/enumerations.html#pointer-casting
+        // SAFETY: the enum has a #[repr(usize)]
+        unsafe { *(self as *const Self as *const usize) }
+    }
+
+    fn first() -> Self {
+        Self::try_from_index(0).expect("enum should have at least one variant")
+    }
+
+    fn last() -> Self {
+        Self::try_from_index(usize::from(Self::COUNT) - 1)
+            .expect("enum should have at least one variant")
+    }
+
+    fn wrapping_next(&self) -> Self {
+        Self::try_from_index((self.to_index() + 1) % usize::from(Self::COUNT))
+            .expect("index should be within range 0..Self::COUNT")
+    }
+
+    fn wrapping_prev(&self) -> Self {
+        Self::try_from_index(
+            (self.to_index() + usize::from(Self::COUNT) - 1) % usize::from(Self::COUNT),
+        )
+        .expect("index should be within range 0..Self::COUNT")
+    }
+
+    fn checked_next(&self) -> Option<Self> {
+        if self.to_index() == usize::from(Self::COUNT) - 1 {
+            None
+        } else {
+            Some(Self::try_from_index(self.to_index() + 1).expect("self should not be last"))
+        }
+    }
+
+    fn checked_prev(&self) -> Option<Self> {
+        if self.to_index() == 0 {
+            None
+        } else {
+            Some(Self::try_from_index(self.to_index() - 1).expect("self should not be first"))
+        }
+    }
+
+    fn saturating_next(&self) -> Self {
+        self.checked_next().unwrap_or_else(Self::last)
+    }
+
+    fn saturating_prev(&self) -> Self {
+        self.checked_prev().unwrap_or_else(Self::first)
+    }
 }
