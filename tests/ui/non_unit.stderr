@@ -1,0 +1,17 @@
+error: all variants must be a unit variant
+ --> tests/ui/non_unit.rs:7:9
+  |
+7 |     Some(),
+  |         ^^
+
+error: all variants must be a unit variant
+  --> tests/ui/non_unit.rs:13:9
+   |
+13 |     Some(i32),
+   |         ^^^^^
+
+error: all variants must be a unit variant
+  --> tests/ui/non_unit.rs:19:12
+   |
+19 |     Square { side_len: u32 },
+   |            ^^^^^^^^^^^^^^^^^

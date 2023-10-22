@@ -1,0 +1,5 @@
+error: all variants must have the default discriminant
+ --> tests/ui/enum_discriminant.rs:6:11
+  |
+6 |     Abc = 0,
+  |           ^

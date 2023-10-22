@@ -1,0 +1,15 @@
+error: enum must be non-empty
+ --> tests/ui/empty_enum.rs:3:10
+  |
+3 | #[derive(EnumSelect)]
+  |          ^^^^^^^^^^
+  |
+  = note: this error originates in the derive macro `EnumSelect` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0084]: unsupported representation for zero-variant enum
+ --> tests/ui/empty_enum.rs:4:1
+  |
+4 | #[repr(usize)]
+  | ^^^^^^^^^^^^^^
+5 | enum Infallible {}
+  | --------------- zero-variant enum
