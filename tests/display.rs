@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use enum_select::{Display, EnumSelect};
+use seenum::{Display, EnumSelect};
 
 #[derive(Debug, Display, EnumSelect)]
 #[repr(usize)]

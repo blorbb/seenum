@@ -1,4 +1,4 @@
-use enum_select::EnumSelect;
+use seenum::EnumSelect;
 
 #[derive(EnumSelect)]
 pub enum Something {

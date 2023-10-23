@@ -60,7 +60,7 @@ pub fn derive_enum_select(input: TokenStream) -> TokenStream {
         .collect();
 
     quote! {
-        unsafe impl ::enum_select::EnumSelect for #name {
+        unsafe impl ::seenum::EnumSelect for #name {
             // SAFETY: `count` is non-zero as validated by `validate_input`.
             const COUNT: ::std::num::NonZeroUsize =
                 unsafe { ::std::num::NonZeroUsize::new_unchecked(#count) };

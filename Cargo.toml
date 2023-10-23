@@ -1,15 +1,15 @@
 [package]
-name = "enum-select"
+name = "seenum"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-enum-select-derive = { path = "enum-select-derive", version = "0.1.0" }
+seenum-derive = { path = "seenum-derive", version = "0.1.0" }
 
 [dev-dependencies]
 trybuild = "1"
 
 [workspace]
-members = ["enum-select-derive", "enum-select-core"]
+members = ["seenum-derive", "seenum-core"]

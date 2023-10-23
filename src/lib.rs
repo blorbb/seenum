@@ -3,7 +3,7 @@
 
 use std::num::NonZeroUsize;
 
-pub use enum_select_derive::{Display, EnumSelect};
+pub use seenum_derive::{Display, EnumSelect};
 
 /// An enum trait for traversing through its variants.
 ///
@@ -60,7 +60,7 @@ pub unsafe trait EnumSelect: Sized {
     /// # Examples
     ///
     /// ```
-    /// # use enum_select::EnumSelect;
+    /// # use seenum::EnumSelect;
     /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
     /// #[repr(usize)]
     /// enum Note {
@@ -83,7 +83,7 @@ pub unsafe trait EnumSelect: Sized {
     /// # Examples
     ///
     /// ```
-    /// # use enum_select::EnumSelect;
+    /// # use seenum::EnumSelect;
     /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
     /// #[repr(usize)]
     /// enum Note {
@@ -102,7 +102,7 @@ pub unsafe trait EnumSelect: Sized {
     /// # Examples
     ///
     /// ```
-    /// # use enum_select::EnumSelect;
+    /// # use seenum::EnumSelect;
     /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
     /// #[repr(usize)]
     /// enum Note {
@@ -123,7 +123,7 @@ pub unsafe trait EnumSelect: Sized {
     /// # Examples
     ///
     /// ```
-    /// # use enum_select::EnumSelect;
+    /// # use seenum::EnumSelect;
     /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
     /// #[repr(usize)]
     /// enum Note {
@@ -147,7 +147,7 @@ pub unsafe trait EnumSelect: Sized {
     /// # Examples
     ///
     /// ```
-    /// # use enum_select::EnumSelect;
+    /// # use seenum::EnumSelect;
     /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
     /// #[repr(usize)]
     /// enum Note {
@@ -172,7 +172,7 @@ pub unsafe trait EnumSelect: Sized {
     /// # Examples
     ///
     /// ```
-    /// # use enum_select::EnumSelect;
+    /// # use seenum::EnumSelect;
     /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
     /// #[repr(usize)]
     /// enum Note {
@@ -198,7 +198,7 @@ pub unsafe trait EnumSelect: Sized {
     /// # Examples
     ///
     /// ```
-    /// # use enum_select::EnumSelect;
+    /// # use seenum::EnumSelect;
     /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
     /// #[repr(usize)]
     /// enum Note {
@@ -225,7 +225,7 @@ pub unsafe trait EnumSelect: Sized {
     /// # Examples
     ///
     /// ```
-    /// # use enum_select::EnumSelect;
+    /// # use seenum::EnumSelect;
     /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
     /// #[repr(usize)]
     /// enum Note {
@@ -248,7 +248,7 @@ pub unsafe trait EnumSelect: Sized {
     /// # Examples
     ///
     /// ```
-    /// # use enum_select::EnumSelect;
+    /// # use seenum::EnumSelect;
     /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
     /// #[repr(usize)]
     /// enum Note {
@@ -270,7 +270,7 @@ pub unsafe trait EnumSelect: Sized {
     /// # Examples
     ///
     /// ```
-    /// # use enum_select::EnumSelect;
+    /// # use seenum::EnumSelect;
     /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
     /// #[repr(usize)]
     /// enum Note {

@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use enum_select::EnumSelect;
+use seenum::EnumSelect;
 
 #[derive(Debug, PartialEq, EnumSelect)]
 #[repr(usize)]
