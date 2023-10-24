@@ -113,7 +113,7 @@ pub unsafe trait EnumSelect: Sized {
     /// ```
     #[must_use]
     fn last() -> Self {
-        Self::try_from_index(usize::from(Self::COUNT) - 1)
+        Self::try_from_index(Self::COUNT.get() - 1)
             .expect("enum should have at least one variant")
     }
 
@@ -137,7 +137,7 @@ pub unsafe trait EnumSelect: Sized {
     /// ```
     #[must_use = "returns a new instance instead of modifying its argument"]
     fn wrapping_next(&self) -> Self {
-        Self::try_from_index((self.to_index() + 1) % usize::from(Self::COUNT))
+        Self::try_from_index((self.to_index() + 1) % Self::COUNT.get())
             .expect("index should be within range 0..Self::COUNT")
     }
 
@@ -162,7 +162,7 @@ pub unsafe trait EnumSelect: Sized {
     #[must_use = "returns a new instance instead of modifying its argument"]
     fn wrapping_prev(&self) -> Self {
         Self::try_from_index(
-            (self.to_index() + usize::from(Self::COUNT) - 1) % usize::from(Self::COUNT),
+            (self.to_index() + Self::COUNT.get() - 1) % Self::COUNT.get(),
         )
         .expect("index should be within range 0..Self::COUNT")
     }
@@ -186,7 +186,7 @@ pub unsafe trait EnumSelect: Sized {
     /// ```
     #[must_use = "returns a new instance instead of modifying its argument"]
     fn checked_next(&self) -> Option<Self> {
-        if self.to_index() == usize::from(Self::COUNT) - 1 {
+        if self.to_index() == Self::COUNT.get() - 1 {
             None
         } else {
             Some(Self::try_from_index(self.to_index() + 1).expect("self should not be last"))

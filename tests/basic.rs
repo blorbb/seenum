@@ -13,7 +13,7 @@ enum E {
 
 #[test]
 fn indices() {
-    assert_eq!(usize::from(E::COUNT), 4);
+    assert_eq!(E::COUNT.get(), 4);
     assert_eq!(E::A.to_index(), 0);
     assert_eq!(E::B.to_index(), 1);
     assert_eq!(E::C.to_index(), 2);
