@@ -1,7 +1,7 @@
 #![forbid(unsafe_op_in_unsafe_fn)]
 #![warn(clippy::pedantic)]
 
-use std::num::NonZeroUsize;
+use core::num::NonZeroUsize;
 
 pub use seenum_derive::{Display, EnumSelect};
 
@@ -64,7 +64,7 @@ where
     /// the range `0..Self::COUNT` (not including `COUNT`).
 
     // This method can't have a default implementation as the size is unknown,
-    // `std::mem::transmute` doesn't compile.
+    // `core::mem::transmute` doesn't compile.
     #[must_use]
     unsafe fn from_index_unchecked(index: usize) -> Self;
 

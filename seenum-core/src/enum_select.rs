@@ -15,9 +15,9 @@ fn derive_impl(input: TokenStream) -> syn::Result<TokenStream> {
             // SAFETY: `count` is non-zero as validated by `validate_input`.
             const ALL: &'static [Self] = [#(Self::#variants),*].as_slice();
 
-            unsafe fn from_index_unchecked(index: ::std::primitive::usize) -> Self {
+            unsafe fn from_index_unchecked(index: ::core::primitive::usize) -> Self {
                 // SAFETY: `index` must be between `0..Self::COUNT`.
-                unsafe { ::std::mem::transmute(index) }
+                unsafe { ::core::mem::transmute(index) }
             }
         }
     })
