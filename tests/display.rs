@@ -19,10 +19,7 @@ enum DurationType {
 
 #[test]
 fn display() {
-    let displays: Vec<_> = DurationType::as_slice()
-        .iter()
-        .map(ToString::to_string)
-        .collect();
+    let displays: Vec<_> = DurationType::ALL.iter().map(ToString::to_string).collect();
 
     assert_eq!(
         displays,

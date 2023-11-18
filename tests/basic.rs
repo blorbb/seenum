@@ -53,7 +53,7 @@ fn traversal() {
 }
 
 fn slice() {
-    let s = E::as_slice();
+    let s = E::ALL;
     assert_eq!(s, [E::A, E::B, E::C, E::D].as_slice());
 }
 

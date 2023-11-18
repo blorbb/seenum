@@ -54,24 +54,17 @@ pub fn derive_enum_select(input: TokenStream) -> TokenStream {
     let UnitEnum { name, variants } = validate_input(input);
 
     let count = variants.len();
-    let slice_inner: TokenStream = variants
-        .iter()
-        .map(|ident| quote! { Self::#ident, })
-        .collect();
 
     quote! {
         unsafe impl ::seenum::EnumSelect for #name {
             // SAFETY: `count` is non-zero as validated by `validate_input`.
             const COUNT: ::std::num::NonZeroUsize =
                 unsafe { ::std::num::NonZeroUsize::new_unchecked(#count) };
+            const ALL: &'static [Self] = [#(Self::#variants),*].as_slice();
 
             unsafe fn from_index_unchecked(index: ::std::primitive::usize) -> Self {
                 // SAFETY: `index` must be between `0..Self::COUNT`.
                 unsafe { ::std::mem::transmute(index) }
-            }
-
-            fn as_slice() -> &'static [Self] {
-                [#slice_inner].as_slice()
             }
         }
     }

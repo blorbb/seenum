@@ -22,9 +22,30 @@ pub use seenum_derive::{Display, EnumSelect};
 /// - Have at least one variant
 /// - All variants have the default discriminant, so that discriminants
 ///   in the range `0..Self::COUNT` are all defined.
-pub unsafe trait EnumSelect: Sized {
+pub unsafe trait EnumSelect
+where
+    Self: Sized + 'static,
+{
     /// The number of variants in the enum.
     const COUNT: NonZeroUsize;
+
+    /// All variants as a slice, in order from first to last.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use seenum::EnumSelect;
+    /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
+    /// #[repr(usize)]
+    /// enum Note {
+    ///     A, B, C, D, E, F, G
+    /// }
+    ///
+    /// let slice = Note::ALL;
+    /// assert_eq!(slice[1], Note::B);
+    /// assert_eq!(slice.len(), 7);
+    /// ```
+    const ALL: &'static [Self];
 
     /// Converts an index discriminant to an enum variant. Does not perform
     /// any bounds checks.
@@ -264,23 +285,4 @@ pub unsafe trait EnumSelect: Sized {
     fn saturating_prev(&self) -> Self {
         self.checked_prev().unwrap_or_else(Self::first)
     }
-
-    /// Returns all variants as a slice, in order from first to last.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use seenum::EnumSelect;
-    /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
-    /// #[repr(usize)]
-    /// enum Note {
-    ///     A, B, C, D, E, F, G
-    /// }
-    ///
-    /// let slice = Note::as_slice();
-    /// assert_eq!(slice[1], Note::B);
-    /// assert_eq!(slice.len(), 7);
-    /// ```
-    #[must_use]
-    fn as_slice() -> &'static [Self];
 }
