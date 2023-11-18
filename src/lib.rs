@@ -134,58 +134,7 @@ where
     /// ```
     #[must_use]
     fn last() -> Self {
-        Self::try_from_index(Self::COUNT.get() - 1)
-            .expect("enum should have at least one variant")
-    }
-
-    /// Returns the next variant, wrapping back to the start if `self` is the
-    /// last variant.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use seenum::EnumSelect;
-    /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
-    /// #[repr(usize)]
-    /// enum Note {
-    ///     A, B, C, D, E, F, G
-    /// }
-    ///
-    /// let f = Note::F;
-    /// let g = Note::G;
-    /// assert_eq!(f.wrapping_next(), Note::G);
-    /// assert_eq!(g.wrapping_next(), Note::A);
-    /// ```
-    #[must_use = "returns a new instance instead of modifying its argument"]
-    fn wrapping_next(&self) -> Self {
-        Self::try_from_index((self.to_index() + 1) % Self::COUNT.get())
-            .expect("index should be within range 0..Self::COUNT")
-    }
-
-    /// Returns the previous variant, wrapping around to the last variant
-    /// if `self` is the first variant.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use seenum::EnumSelect;
-    /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
-    /// #[repr(usize)]
-    /// enum Note {
-    ///     A, B, C, D, E, F, G
-    /// }
-    ///
-    /// let b = Note::B;
-    /// let a = Note::A;
-    /// assert_eq!(b.wrapping_prev(), Note::A);
-    /// assert_eq!(a.wrapping_prev(), Note::G);
-    /// ```
-    #[must_use = "returns a new instance instead of modifying its argument"]
-    fn wrapping_prev(&self) -> Self {
-        Self::try_from_index(
-            (self.to_index() + Self::COUNT.get() - 1) % Self::COUNT.get(),
-        )
-        .expect("index should be within range 0..Self::COUNT")
+        Self::try_from_index(Self::COUNT.get() - 1).expect("enum should have at least one variant")
     }
 
     /// Returns the next variant if there is one (`self` is not last).
@@ -238,6 +187,52 @@ where
         } else {
             Some(Self::try_from_index(self.to_index() - 1).expect("self should not be first"))
         }
+    }
+
+    /// Returns the next variant, wrapping back to the start if `self` is the
+    /// last variant.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use seenum::EnumSelect;
+    /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
+    /// #[repr(usize)]
+    /// enum Note {
+    ///     A, B, C, D, E, F, G
+    /// }
+    ///
+    /// let f = Note::F;
+    /// let g = Note::G;
+    /// assert_eq!(f.wrapping_next(), Note::G);
+    /// assert_eq!(g.wrapping_next(), Note::A);
+    /// ```
+    #[must_use = "returns a new instance instead of modifying its argument"]
+    fn wrapping_next(&self) -> Self {
+        self.checked_next().unwrap_or_else(Self::first)
+    }
+
+    /// Returns the previous variant, wrapping around to the last variant
+    /// if `self` is the first variant.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use seenum::EnumSelect;
+    /// #[derive(Debug, PartialEq, Eq, EnumSelect)]
+    /// #[repr(usize)]
+    /// enum Note {
+    ///     A, B, C, D, E, F, G
+    /// }
+    ///
+    /// let b = Note::B;
+    /// let a = Note::A;
+    /// assert_eq!(b.wrapping_prev(), Note::A);
+    /// assert_eq!(a.wrapping_prev(), Note::G);
+    /// ```
+    #[must_use = "returns a new instance instead of modifying its argument"]
+    fn wrapping_prev(&self) -> Self {
+        self.checked_prev().unwrap_or_else(Self::last)
     }
 
     /// Returns the next variant, saturating at the last variant if necessary
