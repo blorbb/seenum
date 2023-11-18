@@ -26,10 +26,11 @@ pub unsafe trait EnumSelect
 where
     Self: Sized + 'static,
 {
-    /// The number of variants in the enum.
-    const COUNT: NonZeroUsize;
-
     /// All variants as a slice, in order from first to last.
+    ///
+    /// From this trait's guarantees, there will always be at least one element.
+    ///
+    /// If you would like to get the length as a [`NonZeroUsize`], use [`COUNT`](EnumSelect::COUNT) instead.
     ///
     /// # Examples
     ///
@@ -46,6 +47,10 @@ where
     /// assert_eq!(slice.len(), 7);
     /// ```
     const ALL: &'static [Self];
+
+    /// The number of variants in the enum.
+    // SAFETY: this trait (and `Self::ALL`) must have at least one variant, so len is not zero.
+    const COUNT: NonZeroUsize = unsafe { NonZeroUsize::new_unchecked(Self::ALL.len()) };
 
     /// Converts an index discriminant to an enum variant. Does not perform
     /// any bounds checks.
@@ -66,6 +71,9 @@ where
     /// Converts an index discriminant to an enum variant.
     ///
     /// If the index is not within `0..Self::COUNT`, [`None`] is returned.
+
+    // Not just using `Self::ALL.get()` as it would add the requirement that `Self: Clone` / `Copy`;
+    // even though it should be derived for this kind of enum, would rather not add the requirement.
     #[must_use]
     fn try_from_index(index: usize) -> Option<Self> {
         if (0..Self::COUNT.into()).contains(&index) {

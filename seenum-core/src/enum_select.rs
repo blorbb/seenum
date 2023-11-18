@@ -10,13 +10,9 @@ fn derive_impl(input: TokenStream) -> syn::Result<TokenStream> {
     let input = syn::parse2(input)?;
     let UnitEnum { name, variants } = validate_input(input)?;
 
-    let count = variants.len();
-
     Ok(quote! {
         unsafe impl ::seenum::EnumSelect for #name {
             // SAFETY: `count` is non-zero as validated by `validate_input`.
-            const COUNT: ::std::num::NonZeroUsize =
-                unsafe { ::std::num::NonZeroUsize::new_unchecked(#count) };
             const ALL: &'static [Self] = [#(Self::#variants),*].as_slice();
 
             unsafe fn from_index_unchecked(index: ::std::primitive::usize) -> Self {
